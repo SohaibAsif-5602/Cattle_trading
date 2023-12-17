@@ -1,0 +1,103 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>Maveshi Online Trading</PageTitle>
+<style>
+    /* Resetting CSS styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    /* Your updated styles with specified colors */
+    .header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #212121; /* Dark grey for the header */
+        color: #FAFAFA; /* Set text color to white */
+        padding: 10px;
+    }
+
+    .menu-icon {
+        cursor: pointer;
+        color: #FAFAFA;
+    }
+
+    .app-name {
+        flex: 1;
+        text-align: center;
+    }
+
+    .app-name h1 {
+        margin: 0;
+    }
+
+    .page {
+        display: flex;
+    }
+
+    .sidebar {
+        background-color: #9E9E9E; /* Light grey for the sidebar */
+        color: #212121; /* Dark grey text color */
+        width: 250px;
+        padding: 10px;
+    }
+
+    .content {
+        flex: 1;
+        padding: 10px;
+    }
+
+    /* Apply consistent styling to the navmenu */
+    .nav-scrollable {
+        background-color: #9E9E9E; /* Reddish color for the navmenu */
+        color: red; /* Set text color to white */
+        padding: 10px;
+    }
+
+    /* Override link colors to white */
+    .nav-scrollable a.nav-link {
+        color:black !important;
+    }
+
+    /* Set the icon color inside the navmenu to white */
+    .nav-scrollable .oi {
+        color:black;
+    }
+</style>
+<div class="header">
+    <div class="menu-icon" @onclick="ToggleNavMenu">
+        <span class="oi oi-menu" aria-hidden="true"></span>
+    </div>
+    <div class="app-name">
+        <h1>Maveshi Online Trading</h1>
+    </div>
+</div>
+
+<div class="page">
+    <div class="sidebar @NavMenuCssClass">
+        <NavMenu />
+    </div>
+
+    <main>
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : "";
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

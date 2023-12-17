@@ -1,0 +1,116 @@
+﻿@page "/insertcattle"
+@using MODEL
+@using DAL
+@inject cattle_dal CattleDAL
+@inject NavigationManager NavigationManager
+
+<style>
+    {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-image: url('/images/cow5.jpg');
+        /* Set background properties */
+        background-size: cover; /* Fit the image inside the container */
+        background-repeat: no-repeat; /* Prevent image repetition */
+        background-position: center; /* Center the background */
+
+        height: 100vh; /* Ensure full viewport height */
+
+        justify-content: center;
+        align-items: center;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    /* CSS styles */
+    .form-container {
+        width: 300px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #9E9E9E; /* Light gray border */
+        border-radius: 5px;
+        background-color: #FAFAFA; /* Light background */
+        text-align: center;
+        color: #212121; /* Dark gray text color */
+    }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-container input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+            border: 1px solid #9E9E9E; /* Light gray border */
+            box-sizing: border-box;
+        }
+
+        .form-container button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 3px;
+            background-color: #C62828; /* Red button */
+            color: #FAFAFA; /* White text color */
+            cursor: pointer;
+        }
+
+            .form-container button:hover {
+                background-color: #9E9E9E; /* Darker red on hover */
+            }
+
+</style>
+
+<form class="form-container" @onsubmit="AddNewCattle">
+    <div>
+        <label for="animal">Animal:</label>
+        <input type="text" id="animal" @bind="newCattle.Animal" required />
+    </div>
+    <div>
+        <label for="animalBreed">Animal Breed:</label>
+        <input type="text" id="animalBreed" @bind="newCattle.AnimalBreed" required />
+    </div>
+    <div>
+        <label for="age">Age:</label>
+        <input type="number" id="age" @bind="newCattle.Age" required />
+    </div>
+    <div>
+        <label for="weight">Weight:</label>
+        <input type="number" step="any" id="weight" @bind="newCattle.Weight" required />
+    </div>
+    <div>
+        <label for="price">Price:</label>
+        <input type="number" step="any" id="price" @bind="newCattle.Price" required />
+    </div>
+    <div>
+        <label for="description">Description:</label>
+        <textarea id="description" @bind="newCattle.Description"></textarea>
+    </div>
+    <div>
+        <button type="submit">Add Cattle</button>
+    </div>
+</form>
+
+@code {
+    private Cattle_model newCattle { get; set; } = new Cattle_model();
+
+    private async Task AddNewCattle()
+    {
+        // Call DAL method to insert new cattle
+        CattleDAL.InsertNewCattle(8, newCattle.Animal, newCattle.AnimalBreed,
+                                  newCattle.Age, newCattle.Weight, newCattle.Price, newCattle.Description);
+
+        // Redirect to another page upon successful insertion
+        NavigationManager.NavigateTo("/sell");
+    }
+}

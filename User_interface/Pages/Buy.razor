@@ -1,0 +1,116 @@
+﻿@page "/buy"
+@using MODEL
+@using DAL
+@inject cattle_dal CattleDAL
+
+
+<style>
+    body {
+        background-color: #cc0000; /* Red */
+        margin: 0; /* Remove default body margin */
+        font-family: Arial, sans-serif;
+    }
+
+    .cattle-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* Two tabs per row */
+        grid-gap: 20px; /* Adjust the gap between tabs */
+    }
+
+    .cattle-tab {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* Four columns in each tab */
+        grid-gap: 10px; /* Adjust the gap between columns */
+        align-items: center;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease; /* Adding smooth transition */
+    }
+
+    .cattle-info {
+        grid-column: span 2; /* Span two columns for animal and animal breed */
+    }
+
+    .cattle-image {
+        width: 260px;
+        height: auto;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        grid-column: span 1; /* Span one column for the image */
+    }
+
+    .cattle-actions {
+        display: flex;
+        justify-content: flex-end;
+        grid-column: span 1; /* Span one column for the button */
+    }
+
+    button {
+        padding: 6px 12px;
+        background-color: #FAFAFA;
+        color: #C62828;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+        button:hover {
+            background-color: #9E9E9E;
+        }
+
+    p {
+        color: #2196F3;
+    }
+
+    strong {
+        color: #ff4d4d; /* Red color for strong text */
+    }
+</style>
+
+@if (cattleList != null && cattleList.Any())
+{
+    <div class="cattle-container">
+        @foreach (var cattle in cattleList)
+        {
+            <div class="cattle-tab">
+                <div class="cattle-info">
+                    <p><strong>Animal :</strong> @cattle.Animal</p>
+                    <p><strong>Animal Breed:</strong> @cattle.AnimalBreed</p>
+                    <p><strong>Age:</strong> @cattle.Age</p>
+                    <p><strong>Weight:</strong> @cattle.Weight</p>
+                    <p><strong>Price:</strong> @cattle.Price</p>
+                </div>
+                <img class="cattle-image" src="/images/cow.jpg" alt="Right Image">
+                <div class="cattle-actions">
+                    <button @onclick="() => BuyCattle(cattle.CattleId)">Buy</button>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>No cattle available.</p>
+}
+
+@code {
+    List<Cattle_model> cattleList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch cattle data when the component is initialized
+        cattleList = await cattle_dal.GetCattle();
+    }
+
+    private void BuyCattle(int cattleId)
+    {
+        // Logic for buying the selected cattle
+        // Implement the purchase functionality here
+        Console.WriteLine($"Buying cattle with ID: {cattleId}");
+        // You may redirect to a purchase page or perform any other action here
+    }
+}

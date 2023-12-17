@@ -1,0 +1,153 @@
+﻿@page "/register"
+@using MODEL
+@inject NavigationManager NavigationManager
+@using DAL;
+
+<style>
+    {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-image: url('/images/cow5.jpg');
+        /* Set background properties */
+        background-size: cover; /* Fit the image inside the container */
+        background-repeat: no-repeat; /* Prevent image repetition */
+        background-position: center; /* Center the background */
+
+        height: 100vh; /* Ensure full viewport height */
+
+        justify-content: center;
+        align-items: center;
+    }
+    .error-message {
+        color: red;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    /* CSS styles */
+    .form-container {
+        width: 300px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #9E9E9E; /* Light gray border */
+        border-radius: 5px;
+        background-color: #FAFAFA; /* Light background */
+        text-align: center;
+        color: #212121; /* Dark gray text color */
+    }
+
+        .form-container label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-container input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+            border: 1px solid #9E9E9E; /* Light gray border */
+            box-sizing: border-box;
+        }
+
+        .form-container button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 3px;
+            background-color: #C62828; /* Red button */
+            color: #FAFAFA; /* White text color */
+            cursor: pointer;
+        }
+
+            .form-container button:hover {
+                background-color: #9E9E9E; /* Darker red on hover */
+            }
+
+    .register-text {
+        color: black;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+</style>
+
+@if (!registered)
+{
+    <form class="form-container" @onsubmit="RegisterUser">
+        <div class="register-text">
+            Register
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" @bind="user.Email" required />
+            @if (emailError)
+            {
+                <div class="error-message">Email already registered.</div>
+            }
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" @bind="user.Password" required />
+            @if (passwordError)
+            {
+                <div class="error-message">Passwords do not match.</div>
+            }
+        </div>
+        <div>
+            <label for="confirmPassword">Confirm Password:</label>
+            <input type="password" id="confirmPassword" @bind="confirmPassword" required />
+        </div>
+        <div>
+            <button type="submit">Register</button>
+        </div>
+    </form>
+}
+else
+{
+    <p>User registered successfully!</p>
+}
+
+@code {
+    private bool registered = false;
+    private bool emailError = false;
+    private bool passwordError = false;
+
+    private User_model user { get; set; } = new User_model();
+    private string confirmPassword = "";
+    private DAL.user_dal userDal = new DAL.user_dal();
+
+    private async Task RegisterUser()
+    {
+        emailError = false; // Reset error flags on submit
+        passwordError = false;
+
+        if (user.Password != confirmPassword)
+        {
+            // Set the passwordError flag to display the error message
+            passwordError = true;
+            return;
+        }
+
+        // Check if email is not already registered
+        if (await IsEmailAvailable(user.Email))
+        {
+            userDal.RegisterUser(user);
+            registered = true;
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            // Set the emailError flag to display the error message
+            emailError = true;
+        }
+    }
+
+    private async Task<bool> IsEmailAvailable(string email)
+    {
+        // Ensure you're using the asynchronous version of IsEmailAvailable from userDal
+        return await userDal.IsEmailAvailable(email);
+    }
+}

@@ -1,0 +1,77 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>Cattle Trading App</PageTitle>
+
+<style>
+    .header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #6A1B9A; /* Dark grey for the header */
+        color: white; /* Set text color to white */
+        padding: 10px; /* Example padding */
+    }
+
+    .menu-icon {
+        cursor: pointer; /* Make the icon cursor indicate it's clickable */
+        color: white; /* Set icon color to white */
+    }
+
+    .app-name {
+        flex: 1; /* Allow app name to take available space and center it */
+        text-align: center; /* Center the text within the app name div */
+    }
+
+        .app-name h1 {
+            margin: 0; /* Remove default margin for h1 */
+        }
+
+    /* Apply consistent styling to the navmenu */
+     .nav-scrollable {
+        background-color: #E1BEE7; /* Light grey for the navmenu */
+        color: #6A1B9A; /* Set text color to dark grey */
+        padding: 10px; /* Example padding */
+    }
+
+    /* Override link colors to dark grey */
+    .nav-scrollable a.nav-link {
+            color: #6A1B9A !important;
+    }
+
+    /* Set the icon color inside the navmenu to dark grey */
+    .nav-scrollable .oi {
+            color: #6A1B9A;
+    }
+</style>
+
+<div class="header">
+    <div class="menu-icon" @onclick="ToggleNavMenu">
+        <span class="oi oi-menu" aria-hidden="true"></span>
+    </div>
+    <div class="app-name">
+        <h1>Cattle Trading App</h1>
+    </div>
+</div>
+
+<div class="page">
+    <div class="sidebar @NavMenuCssClass">
+        <NavMenu />
+    </div>
+
+    <main>
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : "";
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}
