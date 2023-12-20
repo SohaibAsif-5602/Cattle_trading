@@ -18,14 +18,14 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: #212121; /* Dark grey for the header */
-        color: #FAFAFA; /* Set text color to white */
-        padding: 10px;
+        background-color: #FFFFFF; /* Dark grey for the header */
+        color: #000000; /* Set text color to white */
+        padding: 7px;
     }
 
     .menu-icon {
         cursor: pointer;
-        color: #FAFAFA;
+        color: #000000;
     }
 
     .app-name {
@@ -35,6 +35,8 @@
 
     .app-name h1 {
         margin: 0;
+            font-weight: bold !important;
+            padding-left: 60px;
     }
 
     .page {
@@ -42,32 +44,45 @@
     }
 
     .sidebar {
-        background-color: #9E9E9E; /* Light grey for the sidebar */
-        color: #212121; /* Dark grey text color */
+        background-color: white;
         width: 250px;
+        height: 100vh;
+        position: fixed; /* Set position to fixed */
+        top: 0;
+        left: -250px; /* Start off-screen to the left */
+        transition: left 0.3s ease; /* Add transition for smooth animation */
         padding: 10px;
     }
+
+        /* Add a class to move the sidebar into view when the nav menu is toggled */
+        .sidebar.active {
+            left: 0;
+        }
 
     .content {
         flex: 1;
         padding: 10px;
+        padding-top:1rem;
     }
 
     /* Apply consistent styling to the navmenu */
     .nav-scrollable {
-        background-color: #9E9E9E; /* Reddish color for the navmenu */
+        background-color: black; /* Reddish color for the navmenu */
         color: red; /* Set text color to white */
-        padding: 10px;
+        padding: 0;
     }
 
     /* Override link colors to white */
     .nav-scrollable a.nav-link {
-        color:black !important;
+        color:white !important;
     }
 
     /* Set the icon color inside the navmenu to white */
     .nav-scrollable .oi {
-        color:black;
+        color:white;
+    }
+    .app-urdu{
+        text-align: center;
     }
 </style>
 <div class="header">
@@ -75,7 +90,11 @@
         <span class="oi oi-menu" aria-hidden="true"></span>
     </div>
     <div class="app-name">
-        <h1>Maveshi Online Trading</h1>
+        <h1>M A W E S H Iㅤمویشی</h1>
+    </div>
+    
+    <div class="">
+        <img src="./images/logo2.png" style="height:55px;"/>
     </div>
 </div>
 
@@ -94,7 +113,7 @@
 @code {
     private bool collapseNavMenu = true;
 
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : "";
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : "active"; // Use "active" class when not collapsed
 
     private void ToggleNavMenu()
     {

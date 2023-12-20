@@ -19,7 +19,7 @@
                     <p class="animal-info"><strong>Weight:</strong> @cattle.Weight</p>
                     <p class="animal-info"><strong>Price:</strong> @cattle.Price</p>
                 </div>
-                <img class="cattle-image" src="/images/cow2.jpg" alt="Right Image">
+                <img class="cattle-image" src="/images/goat.jpg" alt="Right Image">
                 <div class="cattle-actions">
                     <button @onclick="() => CancelCattle(cattle.CattleId)">Cancel</button>
                 </div>
@@ -34,7 +34,7 @@ else
 
 <style>
     body {
-        background-color: #cc0000; /* Red */
+        background-color: #000000; /* Red */
         margin: 0; /* Remove default body margin */
         font-family: Arial, sans-serif;
     }
@@ -54,7 +54,7 @@ else
         margin-bottom: 20px;
         border: 2px solid #ddd;
         border-radius: 10px;
-        background-color: #f9f9f9;
+        background-color: #FFFFFF;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease; /* Adding smooth transition */
     }
@@ -65,9 +65,9 @@ else
 
     .cattle-image {
         width: 260px;
-        height: auto;
+        height: 240px;
         border-radius: 5px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        /*  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); */
         grid-column: span 1; /* Span one column for the image */
     }
 
@@ -80,10 +80,10 @@ else
     button {
         padding: 6px 12px;
         background-color: #FAFAFA;
-        color: #C62828;
-        border: none;
+        color: #eb0000;
         border-radius: 4px;
         cursor: pointer;
+        font-weight: 800;
     }
 
         button:hover {
@@ -91,11 +91,13 @@ else
         }
 
     p {
-        color: #2196F3;
+        color: #eb0000;
+        font-weight: 600;
     }
 
     strong {
-        color: #ff4d4d; /* Red color for strong text */
+        color: #000000;
+        font-weight: 800 !important; /* Red color for strong text */
     }
 </style>
 

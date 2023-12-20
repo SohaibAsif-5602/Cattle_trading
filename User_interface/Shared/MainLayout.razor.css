@@ -22,14 +22,20 @@ main {
 }
 
 .sidebar {
-    /* Set the entire sidebar background to light gray */
-    background-color: #9E9E9E;
+    background-color: white;
     width: 250px;
     height: 100vh;
-    position: sticky;
-    top: 0;
-    padding: 10px; /* Add padding as needed */
+    position:absolute; /* Set position to fixed */
+    top: -9px;
+    left: -250px; /* Start off-screen to the left */
+    transition: left 0.3s ease; /* Add transition for smooth animation */
+    padding: 10px;
 }
+
+    /* Add a class to move the sidebar into view when the nav menu is toggled */
+    .sidebar.active {
+        left: 0;
+    }
 
 .top-row {
     background-color: #f7f7f7;
