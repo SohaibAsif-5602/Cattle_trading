@@ -1,5 +1,5 @@
 ﻿@inherits LayoutComponentBase
-
+@inject IJSRuntime JSRuntime
 <PageTitle>Maveshi Online Trading</PageTitle>
 <style>
     /* Resetting CSS styles */
@@ -33,11 +33,11 @@
         text-align: center;
     }
 
-    .app-name h1 {
-        margin: 0;
+        .app-name h1 {
+            margin: 0;
             font-weight: bold !important;
             padding-left: 60px;
-    }
+        }
 
     .page {
         display: flex;
@@ -62,29 +62,28 @@
     .content {
         flex: 1;
         padding: 10px;
-        padding-top:1rem;
+        padding-top: 1rem;
     }
 
     /* Apply consistent styling to the navmenu */
     .nav-scrollable {
         background-color: black; /* Reddish color for the navmenu */
-        color: red; /* Set text color to white */
+        color: black; /* Change text color to black */
         padding: 0;
     }
 
-    /* Override link colors to white */
-    .nav-scrollable a.nav-link {
-        color:white !important;
-    }
+        /* Override link colors to white */
+        
+        /* Set the icon color inside the navmenu to white */
+        .nav-scrollable .oi {
+            color: white;
+        }
 
-    /* Set the icon color inside the navmenu to white */
-    .nav-scrollable .oi {
-        color:white;
-    }
-    .app-urdu{
+    .app-urdu {
         text-align: center;
     }
 </style>
+
 <div class="header">
     <div class="menu-icon" @onclick="ToggleNavMenu">
         <span class="oi oi-menu" aria-hidden="true"></span>
@@ -92,15 +91,40 @@
     <div class="app-name">
         <h1>M A W E S H Iㅤمویشی</h1>
     </div>
-    
-    <div class="">
-        <img src="./images/logo2.png" style="height:55px;"/>
+    <div>
+        <img src="./images/logo2.png" style="height: 55px;" />
     </div>
 </div>
 
 <div class="page">
-    <div class="sidebar @NavMenuCssClass">
-        <NavMenu />
+    <div class="sidebar @NavMenuCssClass" @onclick="CloseNavMenu" id="sidebar">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="sell">
+                <span class="oi oi-dollar" aria-hidden="true"></span> Sell <!-- Change oi- icon name -->
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="profile">
+                <span class="oi oi-person" aria-hidden="true"></span> Profile
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="about">
+                <span class="oi oi-info" aria-hidden="true"></span> About <!-- Change oi- icon name -->
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="chatbot" Match="NavLinkMatch.All">
+                <span class="oi oi-question-mark" aria-hidden="true"></span> Help
+            </NavLink>
+        </div>
     </div>
 
     <main>
@@ -118,5 +142,21 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    private void CloseNavMenu()
+    {
+        if (!collapseNavMenu)
+        {
+            collapseNavMenu = true;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("closeSidebarOnClickOutside");
+        }
     }
 }
