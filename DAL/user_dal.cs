@@ -43,10 +43,12 @@ namespace DAL
                     if (reader.Read())
                     {
                         user.User_id = Convert.ToInt32(reader["user_id"]);
-                        user.Email = Convert.ToString(reader["email"]);
-                        user.Name = Convert.ToString(reader["name"]);
-                        user.Phone = Convert.ToInt32(reader["phone_number"]);
-                        user.Address = Convert.ToString(reader["address"]);
+
+                        // Check for DBNull before conversion
+                        user.Email = reader["email"] != DBNull.Value ? Convert.ToString(reader["email"]) : null;
+                        user.Name = reader["name"] != DBNull.Value ? Convert.ToString(reader["name"]) : null;
+                        user.Phone = reader["phone_number"] != DBNull.Value ? Convert.ToInt32(reader["phone_number"]) : 0;
+                        user.Address = reader["address"] != DBNull.Value ? Convert.ToString(reader["address"]) : null;
                     }
                     reader.Close();
                 }
@@ -54,6 +56,7 @@ namespace DAL
 
             return user;
         }
+
 
         public void EditUserInfoById(int userId, string name, string phoneNumber, string address)
         {

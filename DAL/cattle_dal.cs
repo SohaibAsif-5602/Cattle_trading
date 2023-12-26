@@ -16,7 +16,7 @@ namespace DAL
         {
             SqlConnection sqlConnection = dbhelper.Getconnection();
             sqlConnection.Open();
-            SqlCommand cmd = new SqlCommand("GetCattle", sqlConnection); // Assuming 'get_cattle_data' is the stored procedure for retrieving cattle data
+            SqlCommand cmd = new SqlCommand("GetActiveCattle", sqlConnection); // Assuming 'get_cattle_data' is the stored procedure for retrieving cattle data
             cmd.CommandType = CommandType.StoredProcedure;
             SqlDataReader reader = cmd.ExecuteReader();
             List<Cattle_model> cattleList = new List<Cattle_model>();
@@ -43,7 +43,7 @@ namespace DAL
         {
             using (SqlConnection connection = dbhelper.Getconnection())
             {
-                using (SqlCommand cmd = new SqlCommand("InsertNewCattle", connection))
+                using (SqlCommand cmd = new SqlCommand("InsertNewCattle2", connection))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@UserId", userId);
@@ -71,11 +71,11 @@ namespace DAL
 
 
 
-        public async Task DeleteCattle(int cattleId)
+        public async Task CancelCattle(int cattleId)
         {
             using (SqlConnection connection = dbhelper.Getconnection())
             {
-                using (SqlCommand cmd = new SqlCommand("DeleteCattle", connection))
+                using (SqlCommand cmd = new SqlCommand("CancelCattle", connection))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@CattleId", cattleId);
@@ -85,6 +85,50 @@ namespace DAL
                 }
             }
         }
+        public async Task UpdateCattleStatus(int cattleId)
+        {
+            using (SqlConnection connection = dbhelper.Getconnection())
+            {
+                using (SqlCommand cmd = new SqlCommand("UpdateCattleStatus", connection))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CattleId", cattleId);
+
+                    await connection.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
+                }
+            }
+        }
+
+        public async Task InsertTradeHistory(int sellerId, int buyerId, int cattleId)
+        {
+            using (SqlConnection connection = dbhelper.Getconnection())
+            {
+                using (SqlCommand cmd = new SqlCommand("InsertTradeHistory", connection))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@seller_id", sellerId);
+                    cmd.Parameters.AddWithValue("@buyer_id", buyerId);
+                    cmd.Parameters.AddWithValue("@cattle_id", cattleId);
+
+                    try
+                    {
+                        await connection.OpenAsync();
+                        await cmd.ExecuteNonQueryAsync();
+
+                        // After inserting into TradeHistory, update cattle status to 'Saled'
+                        await UpdateCattleStatus(cattleId);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Handle the exception (log, throw, etc.)
+                        Console.WriteLine(ex.Message);
+                        throw;
+                    }
+                }
+            }
+        }
+
 
 
 

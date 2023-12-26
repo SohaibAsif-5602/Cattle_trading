@@ -1,0 +1,151 @@
+﻿@page "/profile"
+@using MODEL
+@using DAL
+@using User_interface.Data
+@inject AuthenticationStateService Auth
+@inject NavigationManager NavigationManager
+
+<PageTitle>User Profile</PageTitle>
+
+<div class="container">
+    @if (EditMode)
+    {
+        <form>
+            <div>
+                <label>Name:</label>
+                <input @bind="User.Name" />
+            </div>
+            <div>
+                <label>Phone Number:</label>
+                <input @bind="User.Phone" />
+            </div>
+            <div>
+                <label>Address:</label>
+                <input @bind="User.Address" />
+            </div>
+            <div>
+                <button @onclick="SaveChanges">Save Changes</button>
+                <button @onclick="CancelEdit">Cancel</button>
+            </div>
+        </form>
+    }
+    else
+    {
+        <div class="profile-section">
+            <img src="/images/me.jpg" alt="Owner's Picture" class="owner-image">
+            <p><strong>Email:</strong> @User.Email</p>
+            <p><strong>Name:</strong> @User.Name</p>
+            <p><strong>Phone Number:</strong> @User.Phone</p>
+            <p><strong>Address:</strong> @User.Address</p>
+            <button @onclick="EditProfile">Edit Profile</button>
+        </div>
+    }
+</div>
+
+<style>
+    /* Your existing CSS styles */
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Adjust this as needed for vertical centering */
+    }
+
+    /* Additional CSS for the profile display section */
+    .profile-section {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 20px;
+        max-width: 500px;
+        background-color: #fff; /* Add a white background */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+        text-align: center; /* Center align text */
+        margin: 20px; /* Add margin for spacing */
+    }
+
+        .profile-section p {
+            margin-bottom: 8px;
+            font-size: 16px; /* Increase font size for better readability */
+        }
+
+        .profile-section button {
+            padding: 10px 20px;
+            border-radius: 3px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 16px; /* Increase font size for better readability */
+            transition: background-color 0.3s ease; /* Smooth transition on hover */
+        }
+
+            .profile-section button:hover {
+                background-color: #0056b3;
+            }
+
+    .owner-image {
+        border-radius: 50%;
+        max-width: 250px;
+        height: auto;
+        margin-bottom: 20px; /* Increase margin for spacing */
+    }
+
+    /* Additional styles for the form in EditMode */
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    label {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+    }
+
+    .form-buttons {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+</style>
+
+
+@code {
+    private User_model User { get; set; } = new User_model();
+    private bool EditMode { get; set; } = false;
+    private DAL.user_dal UserDALInstance { get; set; } = new DAL.user_dal();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var currentUserId = Auth.UserId;
+
+        // Retrieve user information using the instance of user_dal
+        User = UserDALInstance.GetUserById(currentUserId);
+    }
+
+    private void EditProfile()
+    {
+        EditMode = true;
+    }
+
+    private void CancelEdit()
+    {
+        EditMode = false;
+    }
+
+    private void SaveChanges()
+    {
+        // Save changes using the instance of user_dal
+        UserDALInstance.EditUserInfoById(User.User_id, User.Name, User.Phone.ToString(), User.Address);
+        EditMode = false;
+    }
+}

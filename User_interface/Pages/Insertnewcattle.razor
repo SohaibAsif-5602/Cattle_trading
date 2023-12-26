@@ -3,7 +3,7 @@
 @using DAL
 @inject cattle_dal CattleDAL
 @inject NavigationManager NavigationManager
-
+@inject AuthenticationStateService Auth
 <style>
     {
         margin: 0;
@@ -106,8 +106,10 @@
 
     private async Task AddNewCattle()
     {
+        var currentUserId = Auth.UserId;
+
         // Call DAL method to insert new cattle
-        CattleDAL.InsertNewCattle(8, newCattle.Animal, newCattle.AnimalBreed,
+        CattleDAL.InsertNewCattle(currentUserId, newCattle.Animal, newCattle.AnimalBreed,
                                   newCattle.Age, newCattle.Weight, newCattle.Price, newCattle.Description);
 
         // Redirect to another page upon successful insertion

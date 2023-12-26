@@ -3,13 +3,14 @@
 @using DAL
 @inject cattle_dal CattleDAL
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateService AuthStateService
 
-<button @onclick="AddNewCattle" style="padding: 6px 12px; background-color: #FAFAFA; color:#C62828; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 10px;">Add Cattle</button>
+<button @onclick="AddNewCattle" class="add-cattle-button">Add Cattle</button>
 
 @if (cattleList != null && cattleList.Any())
 {
     <div class="cattle-container">
-        @foreach (var cattle in cattleList)
+        @foreach (var cattle in cattleList.Where(c => c.UserId == AuthStateService.UserId))
         {
             <div class="cattle-tab">
                 <div class="cattle-info">
@@ -32,23 +33,25 @@ else
     <p>No cattle available.</p>
 }
 
+
 <style>
     body {
-        background-color: #000000; /* Red */
-        margin: 0; /* Remove default body margin */
+        background-color: #000000;
+        margin: 0;
         font-family: Arial, sans-serif;
     }
 
     .cattle-container {
         display: grid;
-        grid-template-columns: repeat(2, 1fr); /* Two tabs per row */
-        grid-gap: 20px; /* Adjust the gap between tabs */
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-gap: 20px;
+        padding: 20px;
     }
 
     .cattle-tab {
         display: grid;
-        grid-template-columns: repeat(4, 1fr); /* Four columns in each tab */
-        grid-gap: 10px; /* Adjust the gap between columns */
+        grid-template-columns: repeat(1, 1fr);
+        grid-gap: 10px;
         align-items: center;
         padding: 20px;
         margin-bottom: 20px;
@@ -56,48 +59,50 @@ else
         border-radius: 10px;
         background-color: #FFFFFF;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease; /* Adding smooth transition */
+        transition: transform 0.3s ease;
     }
 
     .cattle-info {
-        grid-column: span 2; /* Span two columns for animal and animal breed */
+        grid-column: span 1;
     }
 
     .cattle-image {
-        width: 260px;
-        height: 240px;
+        max-width: 100%;
+        height: auto;
         border-radius: 5px;
-        /*  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); */
-        grid-column: span 1; /* Span one column for the image */
     }
 
     .cattle-actions {
         display: flex;
         justify-content: flex-end;
-        grid-column: span 1; /* Span one column for the button */
     }
 
     button {
         padding: 6px 12px;
-        background-color: #FAFAFA;
-        color: #eb0000;
+        border: none;
         border-radius: 4px;
         cursor: pointer;
         font-weight: 800;
     }
 
-        button:hover {
+    .add-cattle-button {
+        background-color: #FAFAFA;
+        color: #C62828;
+        margin-bottom: 10px;
+    }
+
+        .add-cattle-button:hover {
             background-color: #9E9E9E;
         }
 
-    p {
+    .animal-info {
         color: #eb0000;
         font-weight: 600;
     }
 
     strong {
         color: #000000;
-        font-weight: 800 !important; /* Red color for strong text */
+        font-weight: 800 !important;
     }
 </style>
 
@@ -106,21 +111,13 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        // Fetch cattle data when the component is initialized
-        cattleList = await DAL.cattle_dal.GetCattle(); // Accessing the method via class name
+        cattleList = await DAL.cattle_dal.GetCattle();
     }
 
     private async Task CancelCattle(int cattleId)
     {
-        // Logic for canceling the selected cattle
-        // Implement the cancel functionality here
-
-        // Call DAL method to delete the selected cattle
-        await CattleDAL.DeleteCattle(cattleId); // Assuming you have a DeleteCattle method in cattle_dal
-
-        // Refresh the cattle list after deletion
+        await CattleDAL.CancelCattle(cattleId);
         cattleList = await DAL.cattle_dal.GetCattle();
-        // You may redirect to a confirmation page or perform any other action here
     }
 
     private void AddNewCattle()
@@ -128,7 +125,6 @@ else
         if (NavigationManager != null)
         {
             NavigationManager.NavigateTo("/insertcattle");
-            // You may redirect to an add cattle page or perform any other action here
         }
     }
 }

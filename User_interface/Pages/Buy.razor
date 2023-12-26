@@ -3,24 +3,24 @@
 @using DAL
 @inject cattle_dal CattleDAL
 
-
 <style>
     body {
-        background-color: #000000; /* Red */
-        margin: 0; /* Remove default body margin */
+        background-color: #000000;
+        margin: 0;
         font-family: Arial, sans-serif;
     }
 
     .cattle-container {
         display: grid;
-        grid-template-columns: repeat(2, 1fr); /* Two tabs per row */
-        grid-gap: 20px; /* Adjust the gap between tabs */
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-gap: 20px;
+        padding: 20px;
     }
 
     .cattle-tab {
         display: grid;
-        grid-template-columns: repeat(4, 1fr); /* Four columns in each tab */
-        grid-gap: 10px; /* Adjust the gap between columns */
+        grid-template-columns: repeat(1, 1fr);
+        grid-gap: 10px;
         align-items: center;
         padding: 20px;
         margin-bottom: 20px;
@@ -28,25 +28,22 @@
         border-radius: 10px;
         background-color: #FFFFFF;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease; /* Adding smooth transition */
+        transition: transform 0.3s ease;
     }
 
     .cattle-info {
-        grid-column: span 2; /* Span two columns for animal and animal breed */
+        grid-column: span 1;
     }
 
     .cattle-image {
-        width: 260px;
-        height: 240px;
+        max-width: 100%;
+        height: auto;
         border-radius: 5px;
-       /*  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); */
-        grid-column: span 1; /* Span one column for the image */
     }
 
     .cattle-actions {
         display: flex;
         justify-content: flex-end;
-        grid-column: span 1; /* Span one column for the button */
     }
 
     button {
@@ -55,7 +52,7 @@
         color: #eb0000;
         border-radius: 4px;
         cursor: pointer;
-        font-weight:800;
+        font-weight: 800;
     }
 
         button:hover {
@@ -64,12 +61,12 @@
 
     p {
         color: #eb0000;
-        font-weight:600;
+        font-weight: 600;
     }
 
     strong {
         color: #000000;
-        font-weight:800 !important; /* Red color for strong text */
+        font-weight: 800 !important;
     }
 </style>
 
@@ -104,15 +101,11 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        // Fetch cattle data when the component is initialized
         cattleList = await cattle_dal.GetCattle();
     }
 
     private void BuyCattle(int cattleId)
     {
-        // Logic for buying the selected cattle
-        // Implement the purchase functionality here
         Console.WriteLine($"Buying cattle with ID: {cattleId}");
-        // You may redirect to a purchase page or perform any other action here
     }
 }

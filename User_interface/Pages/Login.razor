@@ -1,5 +1,6 @@
 ﻿@page "/login"
 @using MODEL
+@inject AuthenticationStateService AuthStateService
 @inject NavigationManager NavigationManager
 @using DAL;
 
@@ -138,8 +139,10 @@
         var (isValidUser, userId) = await IsValidUser(user.Email, user.Password);
         if (isValidUser)
         {
+            AuthStateService.SetAuthenticationState(true, userId);
+
             // Redirect to dashboard or another page upon successful login
-            NavigationManager.NavigateTo($"/buy?userId={userId}");
+            NavigationManager.NavigateTo($"/");
         }
         else
         {
