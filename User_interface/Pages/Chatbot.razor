@@ -1,0 +1,142 @@
+﻿<!-- ChatBot.razor -->
+@page "/chatbot"
+@using Newtonsoft.Json
+@using System.Net.Http.Headers
+@using System.Text
+@using User_interface.Pages
+
+
+<div class="chat-container">
+    <div class="chat-messages">
+        @foreach (var message in chatMessages)
+        {
+            <div class="message @(message.IsUser ? "user" : "bot")">
+                @message.Text
+            </div>
+        }
+    </div>
+    <div class="user-input">
+        <input type="text" @bind="userInput" placeholder="Type your message..." />
+        <button @onclick="SendMessage">Send</button>
+    </div>
+</div>
+
+<style>
+    .chat-container {
+        max-width: 600px;
+        margin: auto;
+    }
+
+    .chat-messages {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .message {
+        margin: 5px;
+        padding: 8px;
+        border-radius: 5px;
+    }
+
+    .user {
+        background-color: #cce5ff;
+    }
+
+    .bot {
+        background-color: #e5ffe5;
+    }
+
+    .user-input {
+        display: flex;
+        margin-top: 10px;
+    }
+
+    input {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px 0 0 5px;
+    }
+
+    button {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 0 5px 5px 0;
+        cursor: pointer;
+    }
+</style>
+
+@code {
+    private List<ChatMessage> chatMessages = new List<ChatMessage>();
+    private string userInput = "";
+    private async Task SendMessage()
+    {
+        if (!string.IsNullOrWhiteSpace(userInput))
+        {
+            // Add user message to chat
+            chatMessages.Add(new ChatMessage { Text = userInput, IsUser = true });
+
+            // Get response from ChatGPT (replace with your ChatGPT integration logic)
+            string botResponse = await GetChatGPTResponse(userInput);
+
+            // Add bot response to chat
+            chatMessages.Add(new ChatMessage { Text = botResponse, IsUser = false });
+
+            // Clear user input
+            userInput = "";
+        }
+    }
+
+    private async Task<string> GetChatGPTResponse(string userMessage)
+    {
+        // Replace 'YOUR_API_KEY' with your actual OpenAI GPT-3 API key
+        string apiKey = "";
+        string apiUrl = "https://api.openai.com/v1/engines/davinci/completions";
+
+        using (HttpClient httpClient = new HttpClient())
+        {
+            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+
+            // Prepare the request data
+            var requestData = new
+            {
+                prompt = userMessage,
+                max_tokens = 150,
+                temperature = 0.7
+            };
+
+            // Serialize the request data to JSON
+            string jsonData = JsonConvert.SerializeObject(requestData);
+
+            // Send a POST request to the GPT-3 API
+            
+            var response = await httpClient.PostAsync(apiUrl, new StringContent(jsonData, Encoding.UTF8, "application/json"));
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Parse and extract the generated text from the response
+                var responseData = JsonConvert.DeserializeObject<OpenAIResponse>(await response.Content.ReadAsStringAsync());
+                return responseData.choices.FirstOrDefault()?.text ?? "No response from ChatGPT.";
+            }
+            else
+            {
+                return $"Error communicating with Chatbot. Status: {response.StatusCode}, Content: {await response.Content.ReadAsStringAsync()}";
+            }
+        }
+    }
+
+    private class OpenAIResponse
+    {
+        public List<Choice> choices { get; set; }
+
+        public class Choice
+        {
+            public string text { get; set; }
+        }
+    }
+
+}
