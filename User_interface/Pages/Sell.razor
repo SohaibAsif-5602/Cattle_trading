@@ -1,38 +1,12 @@
-﻿@page "/sell"
+﻿<!-- Sell.razor -->
+@page "/sell"
 @using MODEL
 @using DAL
 @inject cattle_dal CattleDAL
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateService AuthStateService
 
-<button @onclick="AddNewCattle" class="add-cattle-button">Add Cattle</button>
-
-@if (cattleList != null && cattleList.Any())
-{
-    <div class="cattle-container">
-        @foreach (var cattle in cattleList.Where(c => c.UserId == AuthStateService.UserId))
-        {
-            <div class="cattle-tab">
-                <div class="cattle-info">
-                    <p class="animal-info"><strong>Animal :</strong> @cattle.Animal</p>
-                    <p class="animal-info"><strong>Animal Breed:</strong> @cattle.AnimalBreed</p>
-                    <p class="animal-info"><strong>Age:</strong> @cattle.Age</p>
-                    <p class="animal-info"><strong>Weight:</strong> @cattle.Weight</p>
-                    <p class="animal-info"><strong>Price:</strong> @cattle.Price</p>
-                </div>
-                <img class="cattle-image" src="/images/goat.jpg" alt="Right Image">
-                <div class="cattle-actions">
-                    <button @onclick="() => CancelCattle(cattle.CattleId)">Cancel</button>
-                </div>
-            </div>
-        }
-    </div>
-}
-else
-{
-    <p>No cattle available.</p>
-}
-
+<PageTitle>Sell Cattle</PageTitle>
 
 <style>
     body {
@@ -104,20 +78,95 @@ else
         color: #000000;
         font-weight: 800 !important;
     }
+
+    .confirmation-dialog {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }
 </style>
+
+@if (cattleList != null && cattleList.Any())
+{
+    <div class="cattle-container">
+        @foreach (var cattle in cattleList.Where(c => c.UserId == AuthStateService.UserId))
+        {
+            <div class="cattle-tab">
+                <div class="cattle-info">
+                    <p class="animal-info"><strong>Animal :</strong> @cattle.Animal</p>
+                    <p class="animal-info"><strong>Animal Breed:</strong> @cattle.AnimalBreed</p>
+                    <p class="animal-info"><strong>Age:</strong> @cattle.Age</p>
+                    <p class="animal-info"><strong>Weight:</strong> @cattle.Weight</p>
+                    <p class="animal-info"><strong>Price:</strong> @cattle.Price</p>
+                </div>
+                <img class="cattle-image" src="/images/goat.jpg" alt="Right Image">
+                <div class="cattle-actions">
+                    <button @onclick="() => ShowCancelConfirmationModal(cattle.CattleId)">Cancel</button>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>No cattle available.</p>
+}
+
+<!-- Confirmation Dialog -->
+<div class="confirmation-dialog" style="display: @(cancelConfirmationDialogVisible ? "block" : "none")">
+    <div class="dialog-content">
+        <p>@cancelConfirmationDialogMessage</p>
+        <div class="dialog-buttons">
+            <button @onclick="ConfirmCancel">Confirm</button>
+            <button @onclick="CancelCancel">Cancel</button>
+        </div>
+    </div>
+</div>
 
 @code {
     List<Cattle_model> cattleList;
+    bool cancelConfirmationDialogVisible = false;
+    string cancelConfirmationDialogMessage;
+    int currentCattleId;
 
     protected override async Task OnInitializedAsync()
     {
         cattleList = await DAL.cattle_dal.GetCattle();
     }
 
+    private void ShowCancelConfirmationModal(int cattleId)
+    {
+        currentCattleId = cattleId;
+        cancelConfirmationDialogVisible = true;
+        cancelConfirmationDialogMessage = "Are you sure you want to cancel this cattle?";
+    }
+
+    private async Task ConfirmCancel()
+    {
+        await CancelCattle(currentCattleId);
+
+        cattleList = await DAL.cattle_dal.GetCattle();
+
+        // Close the confirmation dialog
+        cancelConfirmationDialogVisible = false;
+    }
+
+    private void CancelCancel()
+    {
+        // Close the confirmation dialog
+        cancelConfirmationDialogVisible = false;
+    }
+
     private async Task CancelCattle(int cattleId)
     {
         await CattleDAL.CancelCattle(cattleId);
-        cattleList = await DAL.cattle_dal.GetCattle();
     }
 
     private void AddNewCattle()
