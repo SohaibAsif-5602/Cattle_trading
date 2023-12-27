@@ -57,11 +57,10 @@
     </div>
 </div>
 
-<!-- Trade History -->
-<!-- Trade History -->
-<!-- Trade History --><div class="trade-history">
+
+<div class="trade-history">
     <h3>Trade History</h3>
-    @if (TradeHistoryDetails != null)
+    @if (TradeHistoryDetails != null && TradeHistoryDetails.Any())
     {
         <table class="table">
             <thead>
@@ -70,17 +69,24 @@
                     <th>Seller Name</th>
                     <th>Animal</th>
                     <th>Animal Breed</th>
+                    <th>Price</th>
+
                     <!-- Include other table headers for trade history details -->
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>@TradeHistoryDetails.BuyerName</td>
-                    <td>@TradeHistoryDetails.SellerName</td>
-                    <td>@TradeHistoryDetails.Animal</td>
-                    <td>@TradeHistoryDetails.AnimalBreed</td>
-                    <!-- Include other trade history details as table cells -->
-                </tr>
+                @foreach (var historyDetails in TradeHistoryDetails)
+                {
+                    <tr>
+                        <td>@historyDetails.BuyerName</td>
+                        <td>@historyDetails.SellerName</td>
+                        <td>@historyDetails.Animal</td>
+                        <td>@historyDetails.AnimalBreed</td>
+                        <td>@historyDetails.Price</td>
+
+                        <!-- Include other trade history details as table cells -->
+                    </tr>
+                }
             </tbody>
         </table>
     }
@@ -233,7 +239,7 @@ input {
     private User_model User { get; set; } = new User_model();
     private bool EditMode { get; set; } = false;
     private DAL.user_dal UserDALInstance { get; set; } = new DAL.user_dal();
-    private TradeHistoryDetails TradeHistoryDetails { get; set; }
+    private List<TradeHistoryDetails> TradeHistoryDetails { get; set; }
 
 
     protected override async Task OnInitializedAsync()
@@ -245,6 +251,9 @@ input {
 
         // Get trade history details using the provided user ID
         TradeHistoryDetails = await new TradeHistoryDAL().GetTradeHistoryDetails(currentUserId);
+        Console.WriteLine($"Trade history records count: {TradeHistoryDetails?.Count}");
+
+    
     }
 
     private void EditProfile()

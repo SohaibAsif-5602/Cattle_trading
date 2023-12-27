@@ -282,9 +282,11 @@ else
         var currentUserId = AuthStateService.UserId;
 
         int sellerId = cattleList.First(c => c.CattleId == cattleId).UserId;
+
         int buyerId = currentUserId;
 
         await CattleDAL.InsertTradeHistory(sellerId, buyerId, cattleId);
+
     }
 
     private string GetSellerDisplayName(int userId)
