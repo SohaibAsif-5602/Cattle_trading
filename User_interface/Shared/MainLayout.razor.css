@@ -23,10 +23,10 @@ main {
 
 .sidebar {
     background-color: white;
-    width: 250px;
-    height: 100vh;
+    width: 180px;
+    height: 40vh;
     position:absolute; /* Set position to fixed */
-    top: -9px;
+    top: 0px;
     left: -250px; /* Start off-screen to the left */
     transition: left 0.3s ease; /* Add transition for smooth animation */
     padding: 10px;
@@ -34,7 +34,7 @@ main {
 
     /* Add a class to move the sidebar into view when the nav menu is toggled */
     .sidebar.active {
-        left: 0;
+        left: 27px;
     }
 
 .top-row {

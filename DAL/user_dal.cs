@@ -134,4 +134,80 @@ namespace DAL
 
 
     }
+
+
+
+
+
+
+
+
+    // TradeHistoryDetails class definition
+    // Move the TradeHistoryDetails class to a separate file or section in your code
+    public class TradeHistoryDetails
+    {
+        public string BuyerName { get; set; }
+        public string SellerName { get; set; }
+        public decimal Price { get; set; }
+        public string Animal { get; set; }
+        public string AnimalBreed { get; set; }
+        public int Age { get; set; }
+        public decimal Weight { get; set; }
+        public string Description { get; set; }
+        // Add other properties as needed for trade history details
+    }
+    public class TradeHistoryDAL
+    {
+        public async Task<TradeHistoryDetails> GetTradeHistoryDetails(int userId)
+        {
+            // Your connection logic using dbhelper.Getconnection() goes here
+            using (SqlConnection connection = dbhelper.Getconnection())
+            {
+                using (SqlCommand cmd = new SqlCommand("GetTradeHistoryDetails", connection))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@userId", userId);
+
+                    try
+                    {
+                        await connection.OpenAsync();
+                        SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                        if (reader.HasRows)
+                        {
+                            TradeHistoryDetails historyDetails = new TradeHistoryDetails();
+
+                            while (reader.Read())
+                            {
+                                historyDetails.BuyerName = reader["BuyerName"].ToString();
+                                historyDetails.SellerName = reader["SellerName"].ToString();
+                                historyDetails.Price = Convert.ToDecimal(reader["price"]);
+                                historyDetails.Animal = reader["animal"].ToString();
+                                historyDetails.AnimalBreed = reader["animal_breed"].ToString();
+                                historyDetails.Age = Convert.ToInt32(reader["age"]);
+                                historyDetails.Weight = Convert.ToDecimal(reader["weight"]);
+                                historyDetails.Description = reader["description"].ToString();
+                                // You can add more fields as per your trade history details model
+
+                                // Return trade history details
+                                return historyDetails;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Handle exceptions (log, throw, etc.)
+                        Console.WriteLine(ex.Message);
+                        throw;
+                    }
+                }
+            }
+
+            // If no data found or other conditions, return null or handle appropriately
+            return null;
+        }
+    }
+
+
+
 }

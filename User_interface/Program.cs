@@ -11,6 +11,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddSingleton<AuthenticationStateService>();
 builder.Services.AddScoped<cattle_dal>();
+builder.Services.AddScoped<DAL.user_dal>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -1,4 +1,5 @@
 ﻿@page "/profile"
+
 @using MODEL
 @using DAL
 @using User_interface.Data
@@ -8,121 +9,232 @@
 <PageTitle>User Profile</PageTitle>
 
 <div class="container">
-    @if (EditMode)
+    <div class="profile-container">
+        <div class="profile-image">
+            <img src="/images/me.jpg" alt="Owner's Picture" class="owner-image">
+        </div>
+
+        <!-- Profile Image and Details -->
+        <div class="profile-details">
+            <!-- User Image -->
+            
+            <!-- Profile Details -->
+            @if (EditMode)
+            {
+                <!-- Edit Mode Form -->
+                <form>
+                    <div>
+                        <label>Name:</label>
+                        <input @bind="User.Name" />
+                    </div>
+                    <div>
+                        <label>Phone Number:</label>
+                        <input @bind="User.Phone" />
+                    </div>
+                    <div>
+                        <label>Address:</label>
+                        <input @bind="User.Address" />
+                    </div>
+                    <div class="form-buttons">
+                        <button @onclick="SaveChanges">Save Changes</button>
+                        <button @onclick="CancelEdit">Cancel</button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <!-- Display Mode -->
+                <div class="profile-section">
+                    <p><strong>Email:</strong> @User.Email</p>
+                    <p><strong>Name:</strong> @User.Name</p>
+                    <p><strong>Phone Number:</strong> @User.Phone</p>
+                    <p><strong>Address:</strong> @User.Address</p>
+                    <button @onclick="EditProfile">Edit Profile</button>
+                </div>
+                
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Trade History -->
+<!-- Trade History -->
+<!-- Trade History --><div class="trade-history">
+    <h3>Trade History</h3>
+    @if (TradeHistoryDetails != null)
     {
-        <form>
-            <div>
-                <label>Name:</label>
-                <input @bind="User.Name" />
-            </div>
-            <div>
-                <label>Phone Number:</label>
-                <input @bind="User.Phone" />
-            </div>
-            <div>
-                <label>Address:</label>
-                <input @bind="User.Address" />
-            </div>
-            <div>
-                <button @onclick="SaveChanges">Save Changes</button>
-                <button @onclick="CancelEdit">Cancel</button>
-            </div>
-        </form>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Buyer Name</th>
+                    <th>Seller Name</th>
+                    <th>Animal</th>
+                    <th>Animal Breed</th>
+                    <!-- Include other table headers for trade history details -->
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@TradeHistoryDetails.BuyerName</td>
+                    <td>@TradeHistoryDetails.SellerName</td>
+                    <td>@TradeHistoryDetails.Animal</td>
+                    <td>@TradeHistoryDetails.AnimalBreed</td>
+                    <!-- Include other trade history details as table cells -->
+                </tr>
+            </tbody>
+        </table>
     }
     else
     {
-        <div class="profile-section">
-            <img src="/images/me.jpg" alt="Owner's Picture" class="owner-image">
-            <p><strong>Email:</strong> @User.Email</p>
-            <p><strong>Name:</strong> @User.Name</p>
-            <p><strong>Phone Number:</strong> @User.Phone</p>
-            <p><strong>Address:</strong> @User.Address</p>
-            <button @onclick="EditProfile">Edit Profile</button>
-        </div>
+        <p>No trade history available for this user.</p>
     }
 </div>
 
 <style>
-    /* Your existing CSS styles */
+  
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
 
-    .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh; /* Adjust this as needed for vertical centering */
-    }
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 20px;
+}
 
-    /* Additional CSS for the profile display section */
-    .profile-section {
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        padding: 20px;
-        max-width: 500px;
-        background-color: #fff; /* Add a white background */
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
-        text-align: center; /* Center align text */
-        margin: 20px; /* Add margin for spacing */
-    }
+/* Profile container styles */
+.profile-container {
+    display: flex;
+    align-items: flex-start;
+    max-width: 800px;
+    margin-top: -150px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 
-        .profile-section p {
-            margin-bottom: 8px;
-            font-size: 16px; /* Increase font size for better readability */
+/* Profile image and details styles */
+.profile-details {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    flex: 1;
+}
+
+.profile-image {
+    margin-bottom: 20px;
+}
+
+.owner-image {
+    border-radius: 50%;
+    max-width: 200px;
+    height: auto;
+}
+
+.profile-section {
+    text-align: left;
+    padding:48px;
+}
+
+.profile-section p {
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.profile-section button {
+    padding: 10px 20px;
+    border-radius: 3px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.profile-section button:hover {
+    background-color: #0056b3;
+}
+
+/* Trade history styles */
+.trade-history {
+    max-width: 800px;
+    margin-top: -150px;
+    margin-left:250px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.trade-history h3 {
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+/* Form styles */
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+
+ 
+        .profile-container {
+            flex-direction: row;
+            align-items: center;
+            width:1500px;
+            height:360px;
         }
 
-        .profile-section button {
-            padding: 10px 20px;
-            border-radius: 3px;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            font-size: 16px; /* Increase font size for better readability */
-            transition: background-color 0.3s ease; /* Smooth transition on hover */
+        .profile-image {
+            margin-bottom: 10px;
         }
 
-            .profile-section button:hover {
-                background-color: #0056b3;
-            }
+        .owner-image {
+            max-width: 300px;
+        }
 
-    .owner-image {
-        border-radius: 50%;
-        max-width: 250px;
-        height: auto;
-        margin-bottom: 20px; /* Increase margin for spacing */
-    }
-
-    /* Additional styles for the form in EditMode */
-    form {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    label {
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-
-    input {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
-        border-radius: 3px;
-        border: 1px solid #ccc;
-    }
-
-    .form-buttons {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-    }
+        .profile-details {
+            width: 100%;
+        }
+    
 </style>
 
-
+ 
 @code {
     private User_model User { get; set; } = new User_model();
     private bool EditMode { get; set; } = false;
     private DAL.user_dal UserDALInstance { get; set; } = new DAL.user_dal();
+    private TradeHistoryDetails TradeHistoryDetails { get; set; }
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -130,6 +242,9 @@
 
         // Retrieve user information using the instance of user_dal
         User = UserDALInstance.GetUserById(currentUserId);
+
+        // Get trade history details using the provided user ID
+        TradeHistoryDetails = await new TradeHistoryDAL().GetTradeHistoryDetails(currentUserId);
     }
 
     private void EditProfile()

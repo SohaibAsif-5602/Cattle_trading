@@ -1,7 +1,10 @@
-﻿@page "/buy"
+﻿@page "/fg"
 @using MODEL
 @using DAL
-@inject cattle_dal CattleDAL
+@inject DAL.user_dal userDAL
+@inject DAL.cattle_dal CattleDAL
+@inject AuthenticationStateService AuthStateService
+@inject NavigationManager NavigationManager
 
 <style>
     body {
@@ -43,7 +46,26 @@
 
     .cattle-actions {
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .seller-profile {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    .seller-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .seller-info {
+        display: flex;
+        flex-direction: column;
     }
 
     button {
@@ -68,26 +90,71 @@
         color: #000000;
         font-weight: 800 !important;
     }
+
+    /* Confirmation Dialog */
+    .confirmation-dialog {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        z-index: 1000;
+    }
+
+    .dialog-content {
+        margin-bottom: 10px;
+    }
+
+    .dialog-buttons {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .confirmation-dialog button {
+        margin-left: 10px;
+    }
 </style>
 
-@if (cattleList != null && cattleList.Any())
+@if (!AuthStateService.IsAuthenticated)
+{
+    <p>You are not authenticated. Please <a href="/login">login</a>.</p>
+}
+else if (cattleList != null && cattleList.Any())
 {
     <div class="cattle-container">
         @foreach (var cattle in cattleList)
         {
-            <div class="cattle-tab">
-                <div class="cattle-info">
-                    <p><strong>Animal :</strong> @cattle.Animal</p>
-                    <p><strong>Animal Breed:</strong> @cattle.AnimalBreed</p>
-                    <p><strong>Age:</strong> @cattle.Age</p>
-                    <p><strong>Weight:</strong> @cattle.Weight</p>
-                    <p><strong>Price:</strong> @cattle.Price</p>
+            @if (cattle.UserId != AuthStateService.UserId)
+            {
+                <div class="cattle-tab">
+                    <img class="cattle-image" src="/images/goat.jpg" alt="Right Image">
+
+                    <div class="cattle-info">
+                        <p><strong>Animal :</strong> @cattle.Animal</p>
+                        <p><strong>Animal Breed:</strong> @cattle.AnimalBreed</p>
+                        <p><strong>Age:</strong> @cattle.Age</p>
+                        <p><strong>Weight:</strong> @cattle.Weight</p>
+                        <p><strong>Price:</strong> @cattle.Price</p>
+                    </div>
+                    <div class="cattle-actions">
+                        <!-- Display the seller's profile information -->
+                        <div class="seller-profile">
+                            <img class="seller-avatar" src="/images/me.jpg" alt="Seller Avatar">
+                            <div class="seller-info">
+                                <p> @GetSellerDisplayName(cattle.UserId)</p>
+                                <!-- Add more seller information as needed -->
+                            </div>
+                        </div>
+
+                    </div>
+                    <button @onclick="() => ShowBuyConfirmationModal(cattle.CattleId)">Buy</button>
+
                 </div>
-                <img class="cattle-image" src="/images/goat.jpg" alt="Right Image">
-                <div class="cattle-actions">
-                    <button @onclick="() => BuyCattle(cattle.CattleId)">Buy</button>
-                </div>
-            </div>
+            }
         }
     </div>
 }
@@ -96,16 +163,77 @@ else
     <p>No cattle available.</p>
 }
 
+<!-- Confirmation Dialog -->
+<div class="confirmation-dialog" style="display: @(buyConfirmationDialogVisible ? "block" : "none")">
+    <div class="dialog-content">
+        <p>@buyConfirmationDialogMessage</p>
+        <div class="dialog-buttons">
+            <button @onclick="ConfirmPurchase">Confirm</button>
+            <button @onclick="CancelPurchase">Cancel</button>
+        </div>
+    </div>
+</div>
+
 @code {
     List<Cattle_model> cattleList;
+    bool buyConfirmationDialogVisible = false;
+    string buyConfirmationDialogMessage;
+    int currentCattleId; // Added to store the current cattle ID
 
     protected override async Task OnInitializedAsync()
     {
-        cattleList = await cattle_dal.GetCattle();
+        if (!AuthStateService.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+        else
+        {
+            var currentUserId = AuthStateService.UserId;
+
+            cattleList = (await DAL.cattle_dal.GetCattle())
+                .Where(cattle => cattle.UserId != currentUserId)
+                .ToList();
+        }
     }
 
-    private void BuyCattle(int cattleId)
+    private void ShowBuyConfirmationModal(int cattleId)
     {
-        Console.WriteLine($"Buying cattle with ID: {cattleId}");
+        buyConfirmationDialogVisible = true;
+        currentCattleId = cattleId; // Set the current cattle ID
+        buyConfirmationDialogMessage = "Are you sure you want to buy this cattle?";
+    }
+
+    private async Task ConfirmPurchase()
+    {
+        await BuyCattle(currentCattleId);
+
+        cattleList = (await DAL.cattle_dal.GetCattle())
+            .Where(cattle => cattle.UserId != AuthStateService.UserId)
+            .ToList();
+
+        // Close the confirmation dialog
+        buyConfirmationDialogVisible = false;
+    }
+
+    private void CancelPurchase()
+    {
+        // Close the confirmation dialog
+        buyConfirmationDialogVisible = false;
+    }
+
+    private async Task BuyCattle(int cattleId)
+    {
+        var currentUserId = AuthStateService.UserId;
+
+        int sellerId = cattleList.First(c => c.CattleId == cattleId).UserId;
+        int buyerId = currentUserId;
+
+        await CattleDAL.InsertTradeHistory(sellerId, buyerId, cattleId);
+    }
+
+    private string GetSellerDisplayName(int userId)
+    {
+        var seller = userDAL.GetUserById(userId);
+        return !string.IsNullOrEmpty(seller.Name) ? seller.Name : seller.Email;
     }
 }
